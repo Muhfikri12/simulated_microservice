@@ -9,7 +9,7 @@ import (
 func main() {
 	r := gin.Default()
 
-	secured := r.Group("/payment", AuthMiddleware())
+	secured := r.Group("/payment")
 	{
 		secured.POST("/", CreatePayment)
 		secured.GET("/", ListPayment)
@@ -102,43 +102,43 @@ func UpdateStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		token := c.GetHeader("Authorization")
-		if token == "" {
-			c.JSON(http.StatusUnauthorized, BuildResponse(
-				http.StatusUnauthorized,
-				"Unauthorized: Missing token",
-				nil,
-			))
-			c.Abort()
-			return
-		}
-
-		req, err := http.NewRequest("POST", "http://localhost:8081/authentication", nil)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, BuildResponse(
-				http.StatusInternalServerError,
-				"Internal server error",
-				nil,
-			))
-			c.Abort()
-			return
-		}
-
-		req.Header.Set("Authorization", token)
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil || resp.StatusCode != http.StatusOK {
-			c.JSON(http.StatusUnauthorized, BuildResponse(
-				http.StatusUnauthorized,
-				"Unauthorized: Invalid token",
-				nil,
-			))
-			c.Abort()
-			return
-		}
-
-		c.Next()
-	}
-}
+// func AuthMiddleware() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		token := c.GetHeader("Authorization")
+// 		if token == "" {
+// 			c.JSON(http.StatusUnauthorized, BuildResponse(
+// 				http.StatusUnauthorized,
+// 				"Unauthorized: Missing token",
+// 				nil,
+// 			))
+// 			c.Abort()
+// 			return
+// 		}
+//
+// 		req, err := http.NewRequest("POST", "http://localhost:8081/authentication", nil)
+// 		if err != nil {
+// 			c.JSON(http.StatusInternalServerError, BuildResponse(
+// 				http.StatusInternalServerError,
+// 				"Internal server error",
+// 				nil,
+// 			))
+// 			c.Abort()
+// 			return
+// 		}
+//
+// 		req.Header.Set("Authorization", token)
+// 		client := &http.Client{}
+// 		resp, err := client.Do(req)
+// 		if err != nil || resp.StatusCode != http.StatusOK {
+// 			c.JSON(http.StatusUnauthorized, BuildResponse(
+// 				http.StatusUnauthorized,
+// 				"Unauthorized: Invalid token",
+// 				nil,
+// 			))
+// 			c.Abort()
+// 			return
+// 		}
+//
+// 		c.Next()
+// 	}
+// }
